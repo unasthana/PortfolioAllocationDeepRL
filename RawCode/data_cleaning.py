@@ -6,7 +6,7 @@ from line_profiler import LineProfiler
 def clean_data():
 
     if not os.path.exists("/content/history.csv"):
-        script_path = '/content/OptimizedCode/data_scraping.py'
+        script_path = '/content/RawCode/data_scraping.py'
         subprocess.run(["python", script_path])
 
     hist = pd.read_csv("/content/history.csv")
