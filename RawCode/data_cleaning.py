@@ -17,6 +17,7 @@ def clean_data():
     tickers = stock_tickers["Stock_Ticker"].to_list()
 
     common_dates = None
+    valid_tickers = []
 
     for ticker in tickers:
         stock_data = hist[hist['Ticker'] == ticker]
@@ -30,6 +31,9 @@ def clean_data():
         else:
           common_dates = common_dates.intersection(set(stock_data.index.to_list()))
 
+        valid_tickers.append(ticker)
+
+    hist = hist[hist['Ticker'].isin(valid_tickers)]
     cleaned_data = hist.loc[list(common_dates)]
     cleaned_data.to_csv("/content/cleaned_data.csv", index=True)
 
