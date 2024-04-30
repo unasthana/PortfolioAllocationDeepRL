@@ -1,5 +1,3 @@
-import os
-import subprocess
 import pandas as pd
 import multiprocessing as mp
 from line_profiler import LineProfiler
@@ -24,14 +22,8 @@ def parallel_process(tickers, hist, chunk_size):
     
     return common_dates
 
-def clean_data():
-    if not os.path.exists("/content/history.csv"):
-        script_path = '/content/OptimizedCode/data_scraping.py'
-        subprocess.run(["python", script_path])
-
-    hist = pd.read_csv("/content/history.csv")
+def clean_data(hist):
     hist.dropna(inplace=True)
-    hist.set_index("Date", inplace=True)
 
     ticker_counts = hist.groupby('Ticker').size()
     valid_tickers = ticker_counts[ticker_counts >= 8000].index
@@ -43,10 +35,18 @@ def clean_data():
     
     cleaned_data = hist.loc[list(common_dates)]
     cleaned_data.sort_index(inplace=True)
-    cleaned_data.to_csv("/content/cleaned_data.csv", index=True)
+    
+    return cleaned_data
 
-if __name__ == "__main__":
+def run_clean_data(hist):
     profiler = LineProfiler()
     profiler.add_function(clean_data)
-    profiler.run("clean_data()")
+
+
+    profiler.enable_by_count()
+    cleaned_data = clean_data(hist)
+    profiler.disable_by_count()
+
     profiler.print_stats()
+
+    return cleaned_data
