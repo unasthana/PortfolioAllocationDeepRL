@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings('ignore')
+
 import pandas as pd
 import multiprocessing as mp
 from line_profiler import LineProfiler
