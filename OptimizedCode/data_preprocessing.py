@@ -1,5 +1,9 @@
+import warnings
+warnings.filterwarnings('ignore')
+
 import pandas as pd
 import numpy as np
+from numba import jit
 from line_profiler import LineProfiler
 
 def calculate_macd(df):
@@ -47,21 +51,28 @@ def calculate_ichimoku_cloud(df):
 
     return df
 
+@jit(nopython=True)
+def calculate_covariance(returns, lookback):
+    n_assets = returns.shape[1]
+    cov_list = []
+
+    for i in range(lookback, len(returns)):
+        returns_lookback = returns[i-lookback:i]
+        cov_matrix = np.cov(returns_lookback, rowvar=False)
+        cov_list.append(cov_matrix)
+
+    return cov_list
+
 def get_covariance_matrix(df):
     df.reset_index(inplace=True)
     df = df.sort_values(['Date','Ticker'],ignore_index=True)
     df.index = df.Date.factorize()[0]
 
-    lookback = 252
-    cov_list = []
-
     price_pivot = df.pivot_table(index='Date', columns='Ticker', values='Close')
     returns = price_pivot.pct_change().dropna()
 
-    for i in range(lookback, len(returns)):
-        returns_lookback = returns.iloc[i-lookback:i]
-        covs = returns_lookback.cov().values
-        cov_list.append(covs)
+    lookback = 252
+    cov_list = calculate_covariance(returns.values, lookback)
 
     cov_dates = returns.index[lookback:]
     df_cov = pd.DataFrame({'Date': cov_dates, 'Cov_List': cov_list})
