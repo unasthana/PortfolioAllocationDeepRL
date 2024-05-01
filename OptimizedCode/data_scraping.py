@@ -1,4 +1,6 @@
-import os
+import warnings
+warnings.filterwarnings('ignore')
+
 import yfinance as yf
 import pandas as pd
 from line_profiler import LineProfiler
