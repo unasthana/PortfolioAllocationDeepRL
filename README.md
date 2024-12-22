@@ -1,4 +1,4 @@
-# Portfolio Management using Reinforcement Learning
+# Stock Portfolio Allocation using Latency Optimized Deep Reinforcement Learning
 
 ## Problem Setup
 Effective portfolio management is crucial in finance for maximizing returns and managing risks.
